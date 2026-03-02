@@ -14,17 +14,21 @@ const getBaseURL = () => {
   return url;
 };
 
+const socialProviders = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+  ? {
+      google: {
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      },
+    }
+  : {};
+
 export const auth = betterAuth({
   baseURL: getBaseURL(),
   emailAndPassword: {
     enabled: true,
   },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    },
-  },
+  socialProviders,
   // Session configuration
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
