@@ -1,0 +1,168 @@
+"use client";
+
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock, MapPin, Users, TrendingUp, Plus, Mail } from "lucide-react";
+import { useState } from "react";
+// import EventHiringForm from "@/components/admin/EventHiringForm"; // Commented out to avoid build errors if broken
+
+export default function EventHiringPage() {
+  const inquiries = useQuery(api.inquiries.getAll, {}) || [];
+  const [showForm, setShowForm] = useState(false);
+
+  // Filter inquiries that might differ if we had a type field, but here taking all
+  const hireRequests = inquiries; 
+
+  const stats = {
+    total: hireRequests?.length || 0,
+    pending: hireRequests?.filter((r: any) => r.status === "new").length || 0,
+    quoted: hireRequests?.filter((r: any) => r.status === "contacted").length || 0,
+    confirmed: hireRequests?.filter((r: any) => r.status === "closed").length || 0,
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "new":
+        return "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800";
+      case "contacted":
+        return "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800";
+      case "closed":
+        return "bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800";
+      default:
+        return "bg-gray-500/10 text-gray-700 dark:text-gray-400";
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-serif font-bold tracking-tight">Request Management</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage hire requests and quotes (via Inquiries)
+          </p>
+        </div>
+        {/*
+        <Button
+          onClick={() => setShowForm(!showForm)}
+          className="gap-2 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+        >
+          <Plus className="h-4 w-4" />
+          New Hire Request
+        </Button>
+        */}
+      </div>
+
+      {/*
+      {showForm && (
+        <Card className="border-purple-200 dark:border-purple-800 bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+          <CardHeader>
+            <CardTitle>Create Event Hire Request</CardTitle>
+            <CardDescription>Add a new event decoration hire request</CardDescription>
+          </CardHeader>
+          <CardContent>
+             <EventHiringForm onSuccess={() => setShowForm(false)} /> 
+            <p>Form disabled temporarily.</p>
+          </CardContent>
+        </Card>
+      )}
+      */}
+
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground mt-1">All time</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">New</CardTitle>
+            <Clock className="h-4 w-4 text-orange-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">{stats.pending}</div>
+            <p className="text-xs text-muted-foreground mt-1">Awaiting response</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Contacted</CardTitle>
+            <TrendingUp className="h-4 w-4 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">{stats.quoted}</div>
+            <p className="text-xs text-muted-foreground mt-1">In progress</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Closed</CardTitle>
+            <Users className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{stats.confirmed}</div>
+            <p className="text-xs text-muted-foreground mt-1">Resolved</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Requests List</CardTitle>
+          <CardDescription>
+            View and manage all requests
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {hireRequests && hireRequests.length > 0 ? (
+              hireRequests.map((request: any) => (
+                <div
+                  key={request._id}
+                  className="flex items-start justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                >
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <h3 className="font-semibold">
+                        {request.name || "Guest Request"}
+                      </h3>
+                      <Badge className={getStatusColor(request.status)}>
+                        {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>{new Date(request._creationTime).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                         <Mail className="h-4 w-4" />
+                         <span>{request.email}</span>
+                      </div>
+                      <div className="font-semibold text-foreground col-span-2">
+                        {request.message && request.message.slice(0, 50)}...
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No requests yet</p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

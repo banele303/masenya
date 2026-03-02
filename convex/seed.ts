@@ -1,0 +1,323 @@
+import { mutation } from "./_generated/server";
+
+// Seed function to add demo auto parts
+export const seed = mutation({
+  handler: async (ctx) => {
+    const existingProducts = await ctx.db.query("cars").collect();
+    if (existingProducts.length > 0) {
+      return { message: "Database already seeded", count: existingProducts.length };
+    }
+
+    const demoProducts = [
+      {
+        make: "Toyota",
+        model: "GD-6 Engine Long Block",
+        year: 2022,
+        price: 45000,
+        mileage: 0,
+        fuelType: "Diesel",
+        transmission: "N/A",
+        engineSize: "2.8L",
+        color: "Standard",
+        bodyType: "Engine",
+        description:
+          "Brand new Toyota Hilux/Fortuner 2.8 GD-6 long block engine. OEM certified quality, ready for installation. Includes specialized 6-month warehouse guarantee.",
+        features: [
+          "OEM Certified",
+          "Zero Mileage",
+          "Includes Oil Pump",
+          "Precision Machined",
+          "Fits 2016-2023 Models",
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?q=80&w=2574&auto=format&fit=crop",
+        ],
+        isAvailable: true,
+        isDealOfWeek: true,
+        isFeatured: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        make: "BMW",
+        model: "F30 M-Sport Front Bumper",
+        year: 2018,
+        price: 8500,
+        mileage: 0,
+        fuelType: "N/A",
+        transmission: "N/A",
+        engineSize: "N/A",
+        color: "Primer Grey",
+        bodyType: "Body Part",
+        description:
+          "High-grade ABS plastic front bumper for BMW 3 Series F30. M-Sport styling. Perfect fitment guaranteed. Includes grilles and fog lamp covers.",
+        features: [
+          "Perfect Fitment",
+          "High-Grade ABS",
+          "Primer Finish",
+          "Sport Styling",
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=2670&auto=format&fit=crop",
+        ],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        make: "Brembo",
+        model: "Drilled Performance Brake Kit",
+        year: 2023,
+        price: 12500,
+        mileage: 0,
+        fuelType: "N/A",
+        transmission: "N/A",
+        engineSize: "N/A",
+        color: "Red/Steel",
+        bodyType: "Braking",
+        description:
+          "High-performance Brembo braking kit featuring cross-drilled discs and ceramic pads. Maximum cooling and stopping power for performance vehicles.",
+        features: [
+          "Cross-Drilled",
+          "Ceramic Pads",
+          "Low Dust",
+          "Anti-Rattle Clips",
+          "Better Cooling",
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=2670&auto=format&fit=crop",
+        ],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        make: "Garrett",
+        model: "M12 Turbocharger",
+        year: 2021,
+        price: 18000,
+        mileage: 0,
+        fuelType: "Diesel/Petrol",
+        transmission: "N/A",
+        engineSize: "Multi-fit",
+        color: "Alloy",
+        bodyType: "Performance",
+        description:
+          "Genuine Garrett M12 Turbocharger. High-precision turbine for increased boost and efficiency. Recommended for 2.0L - 3.0L engines.",
+        features: [
+          "Genuine Garrett",
+          "High Boost",
+          "Wastegate Included",
+          "Interchangeable Flange",
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?q=80&w=2574&auto=format&fit=crop",
+        ],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        make: "~Spares City",
+        model: "Heavy Duty 657 Battery",
+        year: 2024,
+        price: 2450,
+        mileage: 0,
+        fuelType: "N/A",
+        transmission: "N/A",
+        engineSize: "N/A",
+        color: "Black",
+        bodyType: "Electrical",
+        description:
+          "High cranking capacity 12V battery suitable for SUVs and Diesel vehicles. 2-year warranty. Maintenance-free design with state-of-charge indicator.",
+        features: [
+          "High Cranking Amps",
+          "Maintenance Free",
+          "2-Year Warranty",
+          "Vibration Resistant",
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=2670&auto=format&fit=crop",
+        ],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        make: "Denso",
+        model: "Iridium Spark Plug Set (x4)",
+        year: 2024,
+        price: 1200,
+        mileage: 0,
+        fuelType: "Petrol",
+        transmission: "N/A",
+        engineSize: "Universal",
+        color: "Steel",
+        bodyType: "Electrical",
+        description:
+          "Denso Iridium Power spark plugs. Ultra-fine 0.4mm iridium center electrode for better ignition and fuel efficiency. Long-lasting performance.",
+        features: [
+          "Iridium Core",
+          "Better Ignition",
+          "High Heat Resistance",
+          "Fuel Efficient",
+        ],
+        images: [
+          "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=2670&auto=format&fit=crop",
+        ],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+    ];
+
+    for (const product of demoProducts) {
+      await ctx.db.insert("cars", product);
+    }
+
+    return { message: "Inventory seeded successfully", count: demoProducts.length };
+  },
+});
+
+export const forceSeed = mutation({
+  handler: async (ctx) => {
+    const moreProducts = [
+      {
+        make: "Mercedes-Benz",
+        model: "M274 2.0L Engine",
+        year: 2019,
+        price: 35000,
+        mileage: 45000,
+        fuelType: "Petrol",
+        transmission: "N/A",
+        engineSize: "2.0L",
+        color: "Alloy",
+        bodyType: "Engine",
+        description: "Tested M274 Engine block with cylinder head. Fits W205 C-Class. Low mileage import.",
+        features: ["Tested", "Low Mileage", "Includes Head"],
+        images: ["/product/engine.png"],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        make: "Volkswagen",
+        model: "DSG 7-Speed Gearbox",
+        year: 2018,
+        price: 18500,
+        mileage: 60000,
+        fuelType: "N/A",
+        transmission: "Automatic",
+        engineSize: "N/A",
+        color: "Silver",
+        bodyType: "Transmission",
+        description: "DQ200 7-Speed DSG automatic transmission. Excellent shifting condition, tested and certified.",
+        features: ["Certified", "Smooth Shifting", "Mechatronics Included"],
+        images: ["/product/gearbox.png"],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        make: "Ford",
+        model: "Ranger T6 Radiator",
+        year: 2020,
+        price: 3200,
+        mileage: 0,
+        fuelType: "N/A",
+        transmission: "N/A",
+        engineSize: "N/A",
+        color: "Black/Silver",
+        bodyType: "Cooling",
+        description: "Heavy duty aluminum radiator for Ford Ranger T6 2.2 and 3.2 TDCi. Brand new aftermarket replacement.",
+        features: ["Heavy Duty", "Aluminum Core", "Direct Fit"],
+        images: ["/product/radiator.png"],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        make: "Audi",
+        model: "A4 B8 Front Shock Absorbers",
+        year: 2015,
+        price: 2400,
+        mileage: 0,
+        fuelType: "N/A",
+        transmission: "N/A",
+        engineSize: "N/A",
+        color: "Black",
+        bodyType: "Suspension",
+        description: "Set of two front gas shock absorbers for Audi A4 B8. Restores factory smooth ride quality.",
+        features: ["Gas Filled", "OEM Quality", "Sold in Pairs"],
+        images: ["/product/shock-absober.png"],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        make: "BMW",
+        model: "F30 LED Headlight Right",
+        year: 2017,
+        price: 8500,
+        mileage: 0,
+        fuelType: "N/A",
+        transmission: "N/A",
+        engineSize: "N/A",
+        color: "Clear",
+        bodyType: "Lighting",
+        description: "Genuine OEM BMW F30 adaptive LED right hand side headlight unit. Fully tested.",
+        features: ["OEM", "Adaptive LED", "Tested"],
+        images: ["/product/bmw-headlight.png"],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      },
+      {
+        make: "Nissan",
+        model: "NP200 Rear Tailgate",
+        year: 2018,
+        price: 2500,
+        mileage: 0,
+        fuelType: "N/A",
+        transmission: "N/A",
+        engineSize: "N/A",
+        color: "White",
+        bodyType: "Body Part",
+        description: "Good condition used Nissan NP200 tailgate in Glacier White. No rust.",
+        features: ["Used OEM", "Rust Free", "Original Paint"],
+        images: ["/product/car-body.png"],
+        isAvailable: true,
+        isDealOfWeek: false,
+        isFeatured: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      }
+    ];
+
+    for (const product of moreProducts) {
+      await ctx.db.insert("cars", product);
+    }
+
+    return { message: "Extra Inventory seeded successfully", count: moreProducts.length };
+  }
+});
