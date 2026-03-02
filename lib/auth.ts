@@ -1,4 +1,6 @@
-import { betterAuth } from "better-auth";
+import type { betterAuth as BetterAuthFn } from "better-auth";
+
+type AuthInstance = ReturnType<typeof BetterAuthFn>;
 
 const getBaseURL = () => {
   let url =
@@ -29,10 +31,15 @@ const getSocialProviders = () =>
       }
     : {};
 
-let _auth: ReturnType<typeof betterAuth> | null = null;
+let _auth: AuthInstance | null = null;
 
-function getAuth() {
+function getAuth(): AuthInstance {
   if (!_auth) {
+    // Lazy-load better-auth to avoid module-level side effects during build
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { betterAuth } = require("better-auth") as {
+      betterAuth: typeof BetterAuthFn;
+    };
     _auth = betterAuth({
       baseURL: getBaseURL(),
       emailAndPassword: {
@@ -48,7 +55,7 @@ function getAuth() {
   return _auth;
 }
 
-export const auth = new Proxy({} as ReturnType<typeof betterAuth>, {
+export const auth = new Proxy({} as AuthInstance, {
   get(_target, prop) {
     return (getAuth() as Record<string | symbol, unknown>)[prop];
   },
