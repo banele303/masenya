@@ -22,8 +22,21 @@ const getBaseURL = () => {
   return url;
 };
 
-export const authClient = createAuthClient({
-  baseURL: getBaseURL(),
-});
+const isBrowser = typeof window !== "undefined";
+
+export const authClient = isBrowser
+  ? createAuthClient({
+      baseURL: getBaseURL(),
+    })
+  : ({
+      signIn: {
+        email: async () => ({ data: null, error: null }),
+      },
+      signUp: {
+        email: async () => ({ data: null, error: null }),
+      },
+      signOut: async () => {},
+      useSession: () => ({ data: null, isPending: true, error: null }),
+    } as unknown as ReturnType<typeof createAuthClient>);
 
 export const { signIn, signUp, signOut, useSession } = authClient;
