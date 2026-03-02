@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
   emailAndPassword: {
     enabled: true,
   },

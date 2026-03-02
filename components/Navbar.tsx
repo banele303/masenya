@@ -91,7 +91,7 @@ export default function Navbar() {
           
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
-            <div className={`relative transition-all duration-300 ${scrolled ? "w-40 h-10" : "w-48 h-12"}`}>
+            <div className={`relative transition-all duration-300 ${scrolled ? "w-48 h-12" : "w-64 h-16"}`}>
                <Image 
                 src="/masenya-logo.png" 
                 alt="Masenya Auto Parts" 
