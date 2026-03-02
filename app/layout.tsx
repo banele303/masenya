@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import dynamic from "next/dynamic";
 import ConvexClientProvider from "./ConvexClientProvider";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+
+// Dynamic import with ssr:false is the definitive fix for the
+// "Provided address was not an absolute URL" prerender error.
+// better-auth/react has module-level side effects (fetch calls) that crash
+// during Next.js static prerendering. Excluding it from SSR entirely prevents this.
+const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
 
 export const metadata: Metadata = {
   title: "Masenya Auto Parts | Premier Motor Spares & Accessories South Africa",
