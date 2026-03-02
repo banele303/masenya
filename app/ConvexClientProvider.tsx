@@ -1,14 +1,30 @@
 "use client";
 
 import { ConvexProvider, ConvexReactClient } from "convex/react";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 
-const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
+
+let convexClient: ConvexReactClient | null = null;
+
+function getConvexClient() {
+  if (!convexClient && CONVEX_URL) {
+    convexClient = new ConvexReactClient(CONVEX_URL);
+  }
+  return convexClient;
+}
 
 export default function ConvexClientProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  return <ConvexProvider client={convex}>{children}</ConvexProvider>;
+  const client = useMemo(() => getConvexClient(), []);
+
+  if (!client) {
+    // During build or if env var is missing, render children without Convex
+    return <>{children}</>;
+  }
+
+  return <ConvexProvider client={client}>{children}</ConvexProvider>;
 }
