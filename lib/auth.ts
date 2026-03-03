@@ -1,7 +1,6 @@
 import { betterAuth } from "better-auth";
 
 const getBaseURL = () => {
-  // If we're in the browser, we always use the window location
   if (typeof window !== "undefined") {
     return window.location.origin;
   }
@@ -17,20 +16,8 @@ const getBaseURL = () => {
       : undefined) ||
     "http://localhost:3000";
 
-  // Extremely simple absolute URL enforcement
   if (envUrl.startsWith("http://") || envUrl.startsWith("https://")) {
     return envUrl;
-  }
-  
-  const trimmed = envUrl.trim();
-  if (!trimmed || trimmed === "undefined" || trimmed === "null") {
-    return "http://localhost:3000";
-  }
-
-  // Handle localhost or domains without protocols
-  if (trimmed.includes("localhost") || trimmed.includes("127.0.0.1") || trimmed.includes(".")) {
-    const protocol = (trimmed.includes("localhost") || trimmed.includes("127.0.0.1")) ? "http" : "https";
-    return `${protocol}://${trimmed}`;
   }
 
   return "http://localhost:3000";
@@ -49,7 +36,6 @@ const getSocialProviders = () =>
 let _auth: any = null;
 
 function getAuth() {
-  // Broad detection for any non-runtime environment
   const isServer = typeof window === "undefined";
   const isBuild = isServer && (
     process.env.NEXT_PHASE === "phase-production-build" || 
@@ -58,20 +44,12 @@ function getAuth() {
     !process.env.BETTER_AUTH_SECRET
   );
 
-  console.log("DEBUG: lib/auth getAuth() called. isBuild:", isBuild);
-
   if (isBuild) {
-    console.log("DEBUG: Returning mock auth for build.");
-    // Return a solid mock object that satisfies anyone probing it
     const mockAuth = {
       handler: () => new Response("Auth disabled in build", { status: 503 }),
       api: new Proxy({}, { get: () => () => Promise.resolve({ data: null, error: null }) }),
       options: { baseURL: "http://localhost:3000" },
       session: { get: () => Promise.resolve(null) },
-      $internal: {
-        allRoutes: [],
-        baseURL: "http://localhost:3000"
-      }
     };
     return new Proxy(mockAuth as any, {
        get: (target, prop) => {
@@ -83,21 +61,17 @@ function getAuth() {
 
   if (!_auth) {
     try {
-      console.log("DEBUG: Initializing betterAuth with baseURL:", getBaseURL());
       _auth = betterAuth({
         baseURL: getBaseURL(),
-        emailAndPassword: {
-          enabled: true,
-        },
+        emailAndPassword: { enabled: true },
         socialProviders: getSocialProviders(),
         session: {
           expiresIn: 60 * 60 * 24 * 7,
           updateAge: 60 * 60 * 24,
         },
       });
-      console.log("DEBUG: betterAuth initialized successfully.");
     } catch (e) {
-      console.error("DEBUG: Better Auth runtime initialization error:", e);
+      console.error("Better Auth init error:", e);
       return {
         handler: () => new Response("Auth configuration error", { status: 500 }),
         api: {},
@@ -114,13 +88,10 @@ export const auth: ReturnType<typeof betterAuth> = new Proxy({} as any, {
       return undefined;
     }
     const actualAuth = getAuth();
-    if (prop in actualAuth) {
-      const value = (actualAuth as any)[prop];
-      if (typeof value === "function") {
-        return value.bind(actualAuth);
-      }
-      return value;
+    const value = (actualAuth as any)[prop];
+    if (typeof value === "function") {
+      return value.bind(actualAuth);
     }
-    return undefined;
+    return value;
   },
 });
