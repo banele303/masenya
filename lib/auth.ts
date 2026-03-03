@@ -29,28 +29,15 @@ const getSocialProviders = () =>
       }
     : {};
 
-let _auth: ReturnType<typeof betterAuth> | null = null;
-
-function getAuth() {
-  if (!_auth) {
-    _auth = betterAuth({
-      baseURL: getBaseURL(),
-      emailAndPassword: {
-        enabled: true,
-      },
-      socialProviders: getSocialProviders(),
-      session: {
-        expiresIn: 60 * 60 * 24 * 7, // 7 days
-        updateAge: 60 * 60 * 24, // 1 day
-      },
-    });
-  }
-  return _auth;
-}
-
-export const auth = new Proxy({} as ReturnType<typeof betterAuth>, {
-  get(_target, prop) {
-    return (getAuth() as Record<string | symbol, unknown>)[prop];
+export const auth = betterAuth({
+  baseURL: getBaseURL(),
+  emailAndPassword: {
+    enabled: true,
+  },
+  socialProviders: getSocialProviders(),
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // 1 day
   },
 });
 

@@ -35,7 +35,8 @@ import {
   BadgeCheck,
   ShoppingCart,
   Calendar,
-  User
+  User,
+  Repeat
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -58,7 +59,7 @@ const heroSlides = [
   {
     title: "V12",
     subtitle: "PERFORMANCE",
-    desc: "South Africa's most aggressive spares catalog. Direct-to-workshop pricing.",
+    desc: "South Africa's most aggressive spares catalog. Bulk warehouse availability.",
     image: "/hero-sp.png",
     tag: "Warehouse Exclusive",
     accent: "text-[#ef4444]"
@@ -87,35 +88,35 @@ const categories = [
     icon: Settings, 
     count: "450+ Spares",
     image: "/engine.png",
-    href: "/dealership?category=engines"
+    href: "/products?category=engines"
   },
   { 
     name: "Braking Systems", 
     icon: Disc, 
     count: "1.2k Items",
     image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1200&auto=format&fit=crop",
-    href: "/dealership?category=brakes"
+    href: "/products?category=brakes"
   },
   { 
     name: "Body Panels", 
     icon: ShieldCheck, 
     count: "800+ Panels",
     image: "/car-body.png",
-    href: "/dealership?category=body"
+    href: "/products?category=body"
   },
   { 
     name: "Precision Lighting", 
     icon: Zap, 
     count: "2.5k Units",
     image: "/tires.png",
-    href: "/dealership?category=lighting"
+    href: "/products?category=lighting"
   },
   { 
     name: "Limited Wheels", 
     icon: Activity, 
     count: "300+ Alloys",
     image: "/tire2.png",
-    href: "/dealership?category=wheels"
+    href: "/products?category=wheels"
   }
 
 ];
@@ -280,7 +281,7 @@ export default function Home() {
                         transition={{ delay: 0.3 }}
                         className="flex gap-3"
                       >
-                        <Link href="/dealership">
+                        <Link href="/products">
                           <Button className="rounded-full bg-white text-black hover:bg-slate-100 font-bold px-6 h-10 text-sm shadow-md">
                             Shop Parts
                           </Button>
@@ -318,14 +319,14 @@ export default function Home() {
                   {[...Array(2)].map((_, setIdx) => (
                     <div key={setIdx} className="flex gap-5 shrink-0">
                       {[
-                        { name: "Brake Pads", price: "R450", img: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=200" },
-                        { name: "Oil Filter", price: "R120", img: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=200" },
-                        { name: "Spark Plugs", price: "R85", img: "https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?q=80&w=200" },
-                        { name: "Air Filter", price: "R250", img: "https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?q=80&w=200" },
-                        { name: "Headlights", price: "R1,200", img: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=200" },
-                        { name: "Turbo Kit", price: "R8,500", img: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=200" },
-                        { name: "Exhaust", price: "R3,200", img: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=200" },
-                        { name: "Rims Set", price: "R6,800", img: "https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?q=80&w=200" },
+                        { name: "Brake Pads", tag: "Premium", img: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=200" },
+                        { name: "Oil Filter", tag: "OEM", img: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=200" },
+                        { name: "Spark Plugs", tag: "Iridium", img: "https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?q=80&w=200" },
+                        { name: "Air Filter", tag: "Performance", img: "https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?q=80&w=200" },
+                        { name: "Headlights", tag: "LED", img: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=200" },
+                        { name: "Turbo Kit", tag: "Forged", img: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?q=80&w=200" },
+                        { name: "Exhaust", tag: "Stainless", img: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=200" },
+                        { name: "Rims Set", tag: "Alloy", img: "https://images.unsplash.com/photo-1517524285303-d6fc683dddf8?q=80&w=200" },
                       ].map((product, idx) => (
                         <div key={`${setIdx}-${idx}`} className="flex items-center gap-4 bg-slate-50 rounded-md px-4 py-3 min-w-[220px] hover:bg-slate-100 transition-colors cursor-pointer group">
                           <div className="w-14 h-14 rounded-sm overflow-hidden relative shrink-0">
@@ -333,7 +334,7 @@ export default function Home() {
                           </div>
                           <div>
                             <p className="text-sm font-bold text-slate-800 group-hover:text-[#dc2626] transition-colors">{product.name}</p>
-                            <p className="text-xs font-semibold text-[#dc2626]">{product.price}</p>
+                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{product.tag}</p>
                           </div>
                         </div>
                       ))}
@@ -411,9 +412,9 @@ export default function Home() {
               <p className="text-slate-400 text-xs font-bold uppercase tracking-widest flex items-center justify-center sm:justify-start gap-2">
                 <span>Top Quality</span>
                 <span className="w-1 h-1 bg-slate-700 rounded-full" />
-                <span>Best Prices</span>
+                <span>OEM Verified</span>
                 <span className="w-1 h-1 bg-slate-700 rounded-full" />
-                <span className="text-red-500">Save up to 40%</span>
+                <span className="text-red-500">Nationwide Shipping</span>
               </p>
             </div>
 
@@ -474,7 +475,7 @@ export default function Home() {
               <span className="text-[#ef4444] font-black text-[10px] uppercase tracking-widest mb-1 block">Inventory</span>
               <h2 className="text-2xl font-black text-slate-900 leading-none uppercase italic">Shop By <span className="text-[#ef4444]">Category</span></h2>
             </div>
-            <Link href="/dealership" className="text-[10px] font-black uppercase tracking-widest text-[#ef4444] hover:underline">
+            <Link href="/products" className="text-[10px] font-black uppercase tracking-widest text-[#ef4444] hover:underline">
               View All
             </Link>
           </div>
@@ -579,7 +580,7 @@ export default function Home() {
                 Best-Selling <span className="text-primary">Parts.</span>
               </h2>
             </div>
-            <Link href="/dealership">
+            <Link href="/products">
               <Button variant="outline" className="h-12 px-8 rounded-full border-slate-200 text-slate-900 hover:bg-slate-900 hover:text-white font-bold transition-all">
                 Browse All
               </Button>
@@ -588,14 +589,14 @@ export default function Home() {
  
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { name: "BMW Adaptive LED Headlight", brand: "Bayerische", price: "R12,500", rating: 5, reviews: 24, tag: "Certified", image: "/product/bmw-headlight.png" },
-              { name: "Precision V12 Engine Block", brand: "Elite Performance", price: "R185,000", rating: 5, reviews: 8, tag: "Warehouse Item", image: "/product/engine.png" },
-              { name: "High-Pressure Cooling Radiator", brand: "Arctic", price: "R3,800", rating: 4, reviews: 42, tag: "In Stock", image: "/product/radiator.png" },
-              { name: "Heavy-Duty Gas Shock Absorber", brand: "Bilstein", price: "R4,200", rating: 5, reviews: 18, tag: "Best Seller", image: "/product/shock-absober.png" },
-              { name: "Full-Body Panel Assembly", brand: "Masenya Auto Parts", price: "R52,000", rating: 4, reviews: 12, tag: "Bulk Only", image: "/product/car-body.png" },
-              { name: "Sport Performance Alloy Wheel", brand: "Vossen", price: "R6,500", rating: 5, reviews: 31, tag: "Popular", image: "/product/tire2.png" },
-              { name: "All-Terrain Rugged Tire", brand: "Goodyear", price: "R2,900", rating: 4, reviews: 56, tag: "Trending", image: "/product/tires.png" },
-              { name: "Sequential 6-Speed Gearbox", brand: "ZF Parts", price: "R42,000", rating: 5, reviews: 7, tag: "New Arrival", image: "/product/gearbox.png" },
+              { name: "BMW Adaptive LED Headlight", brand: "Bayerische", tag: "Certified", image: "/product/bmw-headlight.png", rating: 5, reviews: 24 },
+              { name: "Precision V12 Engine Block", brand: "Elite Performance", tag: "Warehouse Item", image: "/product/engine.png", rating: 5, reviews: 8 },
+              { name: "High-Pressure Cooling Radiator", brand: "Arctic", tag: "In Stock", image: "/product/radiator.png", rating: 4, reviews: 42 },
+              { name: "Heavy-Duty Gas Shock Absorber", brand: "Bilstein", tag: "Best Seller", image: "/product/shock-absober.png", rating: 5, reviews: 18 },
+              { name: "Full-Body Panel Assembly", brand: "Masenya Auto Parts", tag: "Bulk Only", image: "/product/car-body.png", rating: 4, reviews: 12 },
+              { name: "Sport Performance Alloy Wheel", brand: "Vossen", tag: "Popular", image: "/product/tire2.png", rating: 5, reviews: 31 },
+              { name: "All-Terrain Rugged Tire", brand: "Goodyear", tag: "Trending", image: "/product/tires.png", rating: 4, reviews: 56 },
+              { name: "Sequential 6-Speed Gearbox", brand: "ZF Parts", tag: "New Arrival", image: "/product/gearbox.png", rating: 5, reviews: 7 },
             ].map((item, idx) => (
               <motion.div
                 key={idx}
@@ -649,10 +650,10 @@ export default function Home() {
                     {item.name}
                   </h4>
 
-                  {/* Price & Action */}
+                  {/* Info & Action */}
                   <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100">
                     <div className="flex flex-col">
-                      {/* Price removed as requested */}
+                       <span className="text-[10px] font-black text-primary uppercase tracking-widest">Inquiry Only</span>
                     </div>
                     <button className="h-9 w-9 bg-slate-100 rounded-lg flex items-center justify-center text-slate-900 group-hover:bg-primary group-hover:text-black transition-all shadow-sm">
                        <ShoppingCart className="w-4 h-4" />
@@ -789,6 +790,125 @@ export default function Home() {
                 </Link>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════ */}
+      {/*  SECTION 6.6: NEW & USED INVENTORY TIERS               */}
+      {/* ═══════════════════════════════════════════════════════ */}
+      <section className="py-32 bg-[#f8fafc]">
+        <div className="container mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* New Parts Tier */}
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative p-12 bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden group"
+            >
+              <div className="absolute top-0 right-0 p-8">
+                 <BadgeCheck className="w-12 h-12 text-primary opacity-10 group-hover:opacity-100 transition-opacity" />
+              </div>
+              <span className="text-primary font-black uppercase tracking-widest text-xs mb-4 block">Tier 01</span>
+              <h3 className="text-4xl font-black text-slate-900 mb-6 italic uppercase">Brand New <br/><span className="text-primary">OEM Spares.</span></h3>
+              <p className="text-slate-500 font-medium mb-8 max-w-md">
+                Direct from the manufacturer. Full warranty coverage and guaranteed zero-mileage performance for elite maintenance.
+              </p>
+              <ul className="space-y-4 mb-10">
+                {["Factory Sealed Packaging", "Manufacturer Warranty", "Certified Compatibility"].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm font-bold text-slate-700">
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Button className="rounded-full bg-slate-900 text-white hover:bg-primary hover:text-black font-bold h-14 px-8 transition-all">
+                Browse New Inventory
+              </Button>
+            </motion.div>
+
+            {/* Used Parts Tier */}
+            <motion.div 
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative p-12 bg-slate-900 rounded-[40px] shadow-2xl shadow-black/20 border border-white/5 overflow-hidden group text-white"
+            >
+              <div className="absolute top-0 right-0 p-8">
+                 <Repeat className="w-12 h-12 text-blue-500 opacity-20 group-hover:opacity-100 transition-opacity" />
+              </div>
+              <span className="text-blue-500 font-black uppercase tracking-widest text-xs mb-4 block">Tier 02</span>
+              <h3 className="text-4xl font-black mb-6 italic uppercase text-white">Verified <br/><span className="text-blue-500">Used Parts.</span></h3>
+              <p className="text-slate-400 font-medium mb-8 max-w-md">
+                Sourced from low-mileage donor vehicles. Rigorously tested by our Hercules technicians for structural integrity.
+              </p>
+              <ul className="space-y-4 mb-10">
+                {["14-Day Fitment Guarantee", "Expert Condition Grading", "Cost-Effective Solutions"].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm font-bold text-slate-300">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Button className="rounded-full bg-white text-black hover:bg-blue-500 font-bold h-14 px-8 transition-all">
+                Search Used Stock
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════ */}
+      {/*  SECTION 6.7: LOCATION & LOGISTICS                    */}
+      {/* ═══════════════════════════════════════════════════════ */}
+      <section className="py-32 bg-white overflow-hidden">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col lg:flex-row items-center gap-20">
+            <div className="lg:w-1/2 relative">
+               <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
+               <div className="relative rounded-[40px] overflow-hidden border-8 border-slate-50 shadow-2xl">
+                 <Image 
+                  src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=1200" 
+                  alt="Warehouse" 
+                  width={800} 
+                  height={600} 
+                  className="object-cover"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
+                 <div className="absolute bottom-8 left-8 right-8 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20">
+                    <p className="text-white font-black uppercase tracking-widest text-xs mb-1">Hercules Operations Hub</p>
+                    <p className="text-white/80 text-sm font-medium">3172 Imetjhuri Crescent, Pretoria West</p>
+                 </div>
+               </div>
+            </div>
+            
+            <div className="lg:w-1/2 space-y-8">
+              <div>
+                <span className="text-primary font-black uppercase tracking-[0.3em] text-[11px] block mb-4">Strategic Logistics</span>
+                <h2 className="text-5xl lg:text-7xl font-black tracking-tighter leading-none text-slate-900 uppercase italic">
+                  BUILT FOR <span className="text-primary">SCALE.</span>
+                </h2>
+              </div>
+              
+              <p className="text-xl text-slate-500 font-medium italic leading-relaxed">
+                Operating from our core warehouse in Pretoria West, we manage a massive distribution network that feeds workshops nationwide.
+              </p>
+
+              <div className="grid grid-cols-2 gap-6 pt-4">
+                 {[
+                   { label: "Dispatch Frequency", val: "Every 4H" },
+                   { label: "Storage Capacity", val: "50k+ Units" },
+                   { label: "Verified Dealers", val: "450+" },
+                   { label: "Technical Staff", val: "24/7" },
+                 ].map((stat, i) => (
+                   <div key={i} className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                     <p className="text-3xl font-black text-slate-900">{stat.val}</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</p>
+                   </div>
+                 ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

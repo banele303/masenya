@@ -22,11 +22,18 @@ interface Car {
   make: string;
   model: string;
   year: number;
-  price: number;
+  price?: number;
   mileage?: number;
   fuelType: string;
   transmission: string;
+  engineSize?: string;
+  color?: string;
+  bodyType?: string;
+  description: string;
+  features?: string[];
   images: string[];
+  isAvailable: boolean;
+  isDealOfWeek?: boolean;
   isFeatured?: boolean;
 }
 
@@ -55,7 +62,7 @@ export default function CarCard({ car }: { car: Car }) {
   };
 
   return (
-    <Link href={`/car/${car._id}`} className="block group">
+    <Link href={`/products/${car._id}`} className="block group">
       <motion.div
         whileHover={{ y: -6 }}
         className="relative bg-white border border-slate-100 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl h-full flex flex-col"

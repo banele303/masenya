@@ -44,7 +44,7 @@ export default function ProductsPage() {
       {/* Modern Stats HUD */}
       <div className="grid gap-6 md:grid-cols-3">
         {[
-          { title: "Total Components", value: productStats?.jewelryCount || 0, desc: "Global SKUs on catalog", icon: Box, color: "text-primary", bg: "bg-primary/5" },
+          { title: "Total Components", value: productStats?.totalProducts || 0, desc: "Global SKUs on catalog", icon: Box, color: "text-primary", bg: "bg-primary/5" },
           { title: "Active Listings", value: productStats?.activeProducts || 0, desc: "Live on showroom floor", icon: Zap, color: "text-blue-500", bg: "bg-blue-500/5" },
           { title: "Critical Stock", value: productStats?.lowStock || 0, desc: "Immediate restock required", icon: Activity, color: "text-red-500", bg: "bg-red-500/5" },
         ].map((stat, i) => (

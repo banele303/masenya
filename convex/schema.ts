@@ -6,7 +6,7 @@ export default defineSchema({
     make: v.string(),
     model: v.string(),
     year: v.number(),
-    price: v.number(),
+    price: v.optional(v.number()),
     mileage: v.optional(v.number()),
     fuelType: v.string(),
     transmission: v.string(),

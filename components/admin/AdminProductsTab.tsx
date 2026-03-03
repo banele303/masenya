@@ -49,9 +49,9 @@ interface AdminProductsTabProps {
   initialCategory?: string;
 }
 
-const BODY_TYPES = ["Sedan", "SUV", "Hatchback", "Coupe", "Convertible", "Bakkie", "Van", "Wagon"];
-const FUEL_TYPES = ["Petrol", "Diesel", "Hybrid", "Electric"];
-const TRANSMISSIONS = ["Automatic", "Manual"];
+const PART_CATEGORIES = ["Engine", "Braking", "Body Panels", "Suspension", "Electrical", "Lighting", "Wheels & Tyres", "Interior", "Other"];
+const CONDITION = ["New", "Used", "Refurbished"];
+const TRANSMISSIONS = ["Automatic", "Manual", "N/A"];
 
 export default function AdminProductsTab({ initialCategory }: AdminProductsTabProps) {
   // We ignore initialCategory as we only manage Cars
@@ -123,13 +123,13 @@ export default function AdminProductsTab({ initialCategory }: AdminProductsTabPr
       make: car.make,
       model: car.model,
       year: car.year,
-      price: car.price,
+      price: car.price || 0,
       mileage: car.mileage || 0,
-      fuelType: car.fuelType,
-      transmission: car.transmission,
+      fuelType: car.fuelType || "N/A",
+      transmission: car.transmission || "N/A",
       engineSize: car.engineSize || "",
       color: car.color || "",
-      bodyType: car.bodyType || "Sedan",
+      bodyType: car.bodyType || "Other",
       description: car.description,
       features: car.features?.join(", ") || "",
       images: [],
@@ -249,14 +249,14 @@ export default function AdminProductsTab({ initialCategory }: AdminProductsTabPr
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search cars..."
+              placeholder="Search inventory..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-11"
             />
           </div>
           <Button onClick={openCreateDialog} className="h-11">
-            <Plus className="mr-2 h-4 w-4" /> Add Car
+            <Plus className="mr-2 h-4 w-4" /> Add Part
           </Button>
         </div>
 
@@ -264,10 +264,9 @@ export default function AdminProductsTab({ initialCategory }: AdminProductsTabPr
           <Table>
             <TableHeader className="bg-muted/30">
               <TableRow>
-                <TableHead>Car</TableHead>
+                <TableHead>Part / Item</TableHead>
                 <TableHead>Specs</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Inventory Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -296,14 +295,11 @@ export default function AdminProductsTab({ initialCategory }: AdminProductsTabPr
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="font-bold">R{car.price.toLocaleString("en-ZA")}</div>
-                    </TableCell>
-                    <TableCell>
                       <div className="flex gap-2">
                          {car.isAvailable ? (
-                            <Badge className="bg-green-500">Available</Badge>
+                            <Badge className="bg-green-500">In Stock</Badge>
                          ) : (
-                            <Badge variant="destructive">Sold</Badge>
+                            <Badge variant="destructive">Out of Stock</Badge>
                          )}
                          {car.isFeatured && <Badge variant="outline">Featured</Badge>}
                       </div>
@@ -354,32 +350,32 @@ export default function AdminProductsTab({ initialCategory }: AdminProductsTabPr
                     <Input id="year" type="number" value={formData.year} onChange={(e) => setFormData({...formData, year: Number(e.target.value)})} required />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="price">Price (R)</Label>
-                    <Input id="price" type="number" value={formData.price} onChange={(e) => setFormData({...formData, price: Number(e.target.value)})} required />
+                    <Label htmlFor="price">Internal Price (Optional)</Label>
+                    <Input id="price" type="number" value={formData.price} onChange={(e) => setFormData({...formData, price: Number(e.target.value)})} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="mileage">Mileage (km)</Label>
+                    <Label htmlFor="mileage">Mileage/Usage (If Used)</Label>
                     <Input id="mileage" type="number" value={formData.mileage} onChange={(e) => setFormData({...formData, mileage: Number(e.target.value)})} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Transmission</Label>
+                    <Label>Compatibility</Label>
                     <Select value={formData.transmission} onValueChange={(val) => setFormData({...formData, transmission: val})}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>{TRANSMISSIONS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Fuel Type</Label>
+                    <Label>Condition</Label>
                     <Select value={formData.fuelType} onValueChange={(val) => setFormData({...formData, fuelType: val})}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>{FUEL_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                        <SelectContent>{CONDITION.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Body Type</Label>
+                    <Label>Category</Label>
                     <Select value={formData.bodyType} onValueChange={(val) => setFormData({...formData, bodyType: val})}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>{BODY_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                        <SelectContent>{PART_CATEGORIES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                </div>

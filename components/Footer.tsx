@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 const quickLinks = [
   { name: "Home", href: "/" },
   { name: "Products", href: "/services" },
-  { name: "Catalog", href: "/dealership" },
+  { name: "Catalog", href: "/products" },
   { name: "Warehouse", href: "/services/workshop" },
   { name: "Blog", href: "/blog" },
   { name: "About Us", href: "/about" },
@@ -101,7 +101,7 @@ export default function Footer() {
             <ul className="space-y-4">
               {products.map((item) => (
                 <li key={item}>
-                  <Link href="/dealership" className="text-slate-500 hover:text-primary transition-all font-bold text-sm uppercase tracking-widest flex items-center gap-2 group">
+                  <Link href="/products" className="text-slate-500 hover:text-primary transition-all font-bold text-sm uppercase tracking-widest flex items-center gap-2 group">
                     <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
                     {item}
                   </Link>
@@ -135,7 +135,7 @@ export default function Footer() {
                 <div>
                   <p className="text-slate-900 font-bold leading-tight italic">
                     3172 Imetjhuri Crescent, Kirkney Estate<br />
-                    Hercules, Pretoria West, 0030
+                    Hercules, Pretoria West
                   </p>
                 </div>
               </div>
