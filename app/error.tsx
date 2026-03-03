@@ -67,8 +67,8 @@ export default function Error({
           <div className="pt-8 border-t w-full max-w-lg">
             <p className="text-sm text-muted-foreground">
               If the problem persists, please contact us at{" "}
-              <a href="mailto:support@monbridal.co.za" className="text-primary underline">
-                support@monbridal.co.za
+              <a href="mailto:masenyaautoparts@gmail.com" className="text-primary underline">
+                masenyaautoparts@gmail.com
               </a>
             </p>
           </div>
