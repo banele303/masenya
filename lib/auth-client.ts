@@ -19,14 +19,17 @@ const getBaseURL = () => {
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
       : "http://localhost:3000");
 
-  try {
-    return new URL(envUrl).origin;
-  } catch (e) {
-    if (envUrl.includes("localhost") || envUrl.includes("127.0.0.1")) {
-      return `http://localhost:3000`;
-    }
-    return "http://localhost:3000";
+  if (envUrl.startsWith("http://") || envUrl.startsWith("https://")) {
+    return envUrl;
   }
+
+  const trimmed = envUrl.trim();
+  if (trimmed.includes("localhost") || trimmed.includes("127.0.0.1") || trimmed.includes(".")) {
+    const protocol = (trimmed.includes("localhost") || trimmed.includes("127.0.0.1")) ? "http" : "https";
+    return `${protocol}://${trimmed}`;
+  }
+
+  return "http://localhost:3000";
 };
 
 const isBrowser = typeof window !== "undefined";
@@ -41,10 +44,16 @@ function getClient() {
   if (!isBrowser) {
     // Return a mock if accessed on the server during build
     return {
-      signIn: { email: async () => ({ data: null, error: null }) },
-      signUp: { email: async () => ({ data: null, error: null }) },
+      signIn: { 
+        email: async () => ({ data: null, error: null }),
+        google: async () => ({ data: null, error: null }),
+      },
+      signUp: { 
+        email: async () => ({ data: null, error: null }),
+      },
       signOut: async () => {},
       useSession: () => ({ data: null, isPending: true, error: null }),
+      session: { get: () => Promise.resolve(null) },
     } as any;
   }
 
@@ -58,7 +67,7 @@ function getClient() {
 
 export const authClient = new Proxy({} as any, {
   get(_target, prop) {
-    if (prop === '$$typeof' || prop === 'prototype' || prop === 'constructor') {
+    if (prop === '$$typeof' || prop === 'prototype' || prop === 'constructor' || prop === 'then') {
       return undefined;
     }
     const client = getClient();
@@ -77,5 +86,6 @@ export const signIn = authClient.signIn;
 export const signUp = authClient.signUp;
 export const signOut = authClient.signOut;
 export const useSession = authClient.useSession;
+
 
 

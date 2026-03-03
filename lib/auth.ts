@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 
 const getBaseURL = () => {
-  // If we're in the browser, we can use the window location
+  // If we're in the browser, we always use the window location
   if (typeof window !== "undefined") {
     return window.location.origin;
   }
@@ -17,31 +17,23 @@ const getBaseURL = () => {
       : undefined) ||
     "http://localhost:3000";
 
-  // Extremely defensive URL parsing
-  try {
-    // If it's already a valid absolute URL, use it
-    const url = new URL(envUrl);
-    if (url.protocol.startsWith('http')) {
-       return url.origin;
-    }
-    throw new Error('Not http');
-  } catch (e) {
-    // Handle specific cases like "localhost:3000" or "/api/auth"
-    const trimmed = envUrl.trim();
-    
-    // If it's a relative path or empty, use the default
-    if (trimmed.startsWith('/') || !trimmed) {
-      return "http://localhost:3000";
-    }
-
-    // Try to guess the protocol
-    try {
-      const protocol = (trimmed.includes("localhost") || trimmed.includes("127.0.0.1")) ? "http" : "https";
-      return new URL(`${protocol}://${trimmed}`).origin;
-    } catch (e2) {
-      return "http://localhost:3000";
-    }
+  // Extremely simple absolute URL enforcement
+  if (envUrl.startsWith("http://") || envUrl.startsWith("https://")) {
+    return envUrl;
   }
+  
+  const trimmed = envUrl.trim();
+  if (!trimmed || trimmed === "undefined" || trimmed === "null") {
+    return "http://localhost:3000";
+  }
+
+  // Handle localhost or domains without protocols
+  if (trimmed.includes("localhost") || trimmed.includes("127.0.0.1") || trimmed.includes(".")) {
+    const protocol = (trimmed.includes("localhost") || trimmed.includes("127.0.0.1")) ? "http" : "https";
+    return `${protocol}://${trimmed}`;
+  }
+
+  return "http://localhost:3000";
 };
 
 const getSocialProviders = () =>
@@ -58,19 +50,21 @@ let _auth: any = null;
 
 function getAuth() {
   // Broad detection for any non-runtime environment
-  const isPrerendering = 
+  const isServer = typeof window === "undefined";
+  const isBuild = isServer && (
     process.env.NEXT_PHASE === "phase-production-build" || 
     process.env.NEXT_PHASE === "phase-export" ||
     process.env.CI === "true" ||
-    (typeof process !== 'undefined' && process.env.NODE_ENV === "production" && !process.env.BETTER_AUTH_SECRET);
+    !process.env.BETTER_AUTH_SECRET
+  );
 
-  if (isPrerendering) {
-    // Return a safe mock object that satisfies the Proxy's needs
+  if (isBuild) {
+    // Return a solid mock object that satisfies anyone probing it
     return {
       handler: () => new Response("Auth disabled in build", { status: 503 }),
-      api: {},
-      options: { baseURL: getBaseURL() },
-      session: { get: () => null }
+      api: new Proxy({}, { get: () => () => Promise.resolve({ data: null, error: null }) }),
+      options: { baseURL: "http://localhost:3000" },
+      session: { get: () => Promise.resolve(null) }
     } as any;
   }
 
@@ -88,12 +82,11 @@ function getAuth() {
         },
       });
     } catch (e) {
-      console.error("Critical: Better Auth failed to initialize at runtime:", e);
-      // Fallback to prevent app crash
+      console.error("Better Auth runtime initialization error:", e);
       return {
-        handler: () => new Response("Auth error", { status: 500 }),
+        handler: () => new Response("Auth configuration error", { status: 500 }),
         api: {},
-        options: { baseURL: getBaseURL() }
+        options: { baseURL: "http://localhost:3000" }
       } as any;
     }
   }
@@ -110,21 +103,19 @@ export const auth: ReturnType<typeof betterAuth> = new Proxy({} as any, {
       return undefined;
     }
     
-    try {
-      const actualAuth = getAuth();
-      if (prop in actualAuth) {
-        const value = (actualAuth as any)[prop];
-        if (typeof value === "function") {
-          return value.bind(actualAuth);
-        }
-        return value;
+    // Defer to actual initialization
+    const actualAuth = getAuth();
+    if (prop in actualAuth) {
+      const value = (actualAuth as any)[prop];
+      if (typeof value === "function") {
+        return value.bind(actualAuth);
       }
-    } catch (e) {
-      console.warn(`Auth Proxy access error for prop "${String(prop)}":`, e);
+      return value;
     }
     return undefined;
   },
 });
+
 
 
 
