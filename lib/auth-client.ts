@@ -1,14 +1,8 @@
 "use client";
 
-// NOTE: This module is only ever loaded in the browser.
-// The Navbar component and Login/Admin components that import this 
-// MUST be dynamically imported with { ssr: false } to prevent Next.js 
-// prerendering from triggering better-auth's internal fetch() calls.
-
 import { createAuthClient } from "better-auth/react";
 
 const getBaseURL = () => {
-  // Browser-only fallback
   if (typeof window !== "undefined") {
     return window.location.origin;
   }
@@ -33,16 +27,13 @@ const getBaseURL = () => {
 };
 
 const isBrowser = typeof window !== "undefined";
-
-/**
- * Lazy-loaded Auth Client.
- * Prevents better-auth from initializing on the server during the build phase.
- */
 let _client: any = null;
 
 function getClient() {
+  console.log("DEBUG: lib/auth-client getClient() called. isBrowser:", isBrowser);
+  
   if (!isBrowser) {
-    // Return a mock if accessed on the server during build
+    console.log("DEBUG: Returning mock client for server/build.");
     const mockClient = {
       signIn: { 
         email: async () => ({ data: null, error: null }),
@@ -55,7 +46,6 @@ function getClient() {
       useSession: () => ({ data: null, isPending: true, error: null }),
       session: { get: () => Promise.resolve(null) },
     };
-    // Solid mock that doesn't crash on property probes
     return new Proxy(mockClient as any, {
       get: (target, prop) => {
         if (prop in target) return target[prop];
@@ -65,13 +55,24 @@ function getClient() {
   }
 
   if (!_client) {
-    _client = createAuthClient({
-      baseURL: getBaseURL(),
-    });
+    try {
+      console.log("DEBUG: Initializing authClient with baseURL:", getBaseURL());
+      _client = createAuthClient({
+        baseURL: getBaseURL(),
+      });
+      console.log("DEBUG: authClient initialized successfully.");
+    } catch (e) {
+      console.error("DEBUG: Client Auth runtime initialization error:", e);
+      return {
+        signIn: { email: async () => ({ data: null, error: null }) },
+        signUp: { email: async () => ({ data: null, error: null }) },
+        signOut: async () => {},
+        useSession: () => ({ data: null, isPending: true, error: null }),
+      } as any;
+    }
   }
   return _client;
 }
-
 
 export const authClient = new Proxy({} as any, {
   get(_target, prop) {
@@ -100,7 +101,6 @@ const createLazyExport = (getter: () => any) => {
       }
       return value;
     },
-    // For things like useSession() that are functions themselves
     apply: (_target, _thisArg, args) => {
       const target = getter();
       return target(...args);
@@ -108,7 +108,7 @@ const createLazyExport = (getter: () => any) => {
   });
 };
 
-export const signIn = createLazyExport(() => getClient().signIn);
-export const signUp = createLazyExport(() => getClient().signUp);
-export const signOut = (...args: any[]) => getClient().signOut(...args);
-export const useSession = () => getClient().useSession();
+export const signIn = createLazyExport(() => authClient.signIn);
+export const signUp = createLazyExport(() => authClient.signUp);
+export const signOut = (...args: any[]) => (authClient as any).signOut(...args);
+export const useSession = () => (authClient as any).useSession();

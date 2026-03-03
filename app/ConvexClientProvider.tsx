@@ -8,11 +8,18 @@ const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 let convexClient: ConvexReactClient | null = null;
 
 function getConvexClient() {
+  console.log("DEBUG: getConvexClient() called. CONVEX_URL:", CONVEX_URL);
   if (!convexClient && CONVEX_URL) {
-    convexClient = new ConvexReactClient(CONVEX_URL);
+    try {
+      convexClient = new ConvexReactClient(CONVEX_URL);
+      console.log("DEBUG: ConvexReactClient initialized successfully.");
+    } catch (e) {
+      console.error("DEBUG: ConvexReactClient initialization FAILED:", e);
+    }
   }
   return convexClient;
 }
+
 
 export default function ConvexClientProvider({
   children,

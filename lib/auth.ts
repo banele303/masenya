@@ -58,14 +58,16 @@ function getAuth() {
     !process.env.BETTER_AUTH_SECRET
   );
 
+  console.log("DEBUG: lib/auth getAuth() called. isBuild:", isBuild);
+
   if (isBuild) {
+    console.log("DEBUG: Returning mock auth for build.");
     // Return a solid mock object that satisfies anyone probing it
     const mockAuth = {
       handler: () => new Response("Auth disabled in build", { status: 503 }),
       api: new Proxy({}, { get: () => () => Promise.resolve({ data: null, error: null }) }),
       options: { baseURL: "http://localhost:3000" },
       session: { get: () => Promise.resolve(null) },
-      // Better auth might probe nested props
       $internal: {
         allRoutes: [],
         baseURL: "http://localhost:3000"
@@ -74,7 +76,6 @@ function getAuth() {
     return new Proxy(mockAuth as any, {
        get: (target, prop) => {
          if (prop in target) return (target as any)[prop];
-         // Fallback for any other method
          return () => Promise.resolve(null);
        }
     });
@@ -82,6 +83,7 @@ function getAuth() {
 
   if (!_auth) {
     try {
+      console.log("DEBUG: Initializing betterAuth with baseURL:", getBaseURL());
       _auth = betterAuth({
         baseURL: getBaseURL(),
         emailAndPassword: {
@@ -93,8 +95,9 @@ function getAuth() {
           updateAge: 60 * 60 * 24,
         },
       });
+      console.log("DEBUG: betterAuth initialized successfully.");
     } catch (e) {
-      console.error("Better Auth runtime initialization error:", e);
+      console.error("DEBUG: Better Auth runtime initialization error:", e);
       return {
         handler: () => new Response("Auth configuration error", { status: 500 }),
         api: {},
@@ -105,18 +108,11 @@ function getAuth() {
   return _auth;
 }
 
-
-/**
- * Lazy-load Better Auth to prevent initialization during the static analysis 
- * phase of the build process.
- */
 export const auth: ReturnType<typeof betterAuth> = new Proxy({} as any, {
   get(_target, prop) {
     if (prop === '$$typeof' || prop === 'prototype' || prop === 'constructor' || prop === 'then') {
       return undefined;
     }
-    
-    // Defer to actual initialization
     const actualAuth = getAuth();
     if (prop in actualAuth) {
       const value = (actualAuth as any)[prop];
@@ -128,7 +124,3 @@ export const auth: ReturnType<typeof betterAuth> = new Proxy({} as any, {
     return undefined;
   },
 });
-
-
-
-
