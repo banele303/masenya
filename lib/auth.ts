@@ -60,12 +60,24 @@ function getAuth() {
 
   if (isBuild) {
     // Return a solid mock object that satisfies anyone probing it
-    return {
+    const mockAuth = {
       handler: () => new Response("Auth disabled in build", { status: 503 }),
       api: new Proxy({}, { get: () => () => Promise.resolve({ data: null, error: null }) }),
       options: { baseURL: "http://localhost:3000" },
-      session: { get: () => Promise.resolve(null) }
-    } as any;
+      session: { get: () => Promise.resolve(null) },
+      // Better auth might probe nested props
+      $internal: {
+        allRoutes: [],
+        baseURL: "http://localhost:3000"
+      }
+    };
+    return new Proxy(mockAuth as any, {
+       get: (target, prop) => {
+         if (prop in target) return (target as any)[prop];
+         // Fallback for any other method
+         return () => Promise.resolve(null);
+       }
+    });
   }
 
   if (!_auth) {
@@ -92,6 +104,7 @@ function getAuth() {
   }
   return _auth;
 }
+
 
 /**
  * Lazy-load Better Auth to prevent initialization during the static analysis 

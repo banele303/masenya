@@ -43,7 +43,7 @@ let _client: any = null;
 function getClient() {
   if (!isBrowser) {
     // Return a mock if accessed on the server during build
-    return {
+    const mockClient = {
       signIn: { 
         email: async () => ({ data: null, error: null }),
         google: async () => ({ data: null, error: null }),
@@ -54,7 +54,14 @@ function getClient() {
       signOut: async () => {},
       useSession: () => ({ data: null, isPending: true, error: null }),
       session: { get: () => Promise.resolve(null) },
-    } as any;
+    };
+    // Solid mock that doesn't crash on property probes
+    return new Proxy(mockClient as any, {
+      get: (target, prop) => {
+        if (prop in target) return target[prop];
+        return () => Promise.resolve({ data: null, error: null });
+      }
+    });
   }
 
   if (!_client) {
@@ -64,6 +71,7 @@ function getClient() {
   }
   return _client;
 }
+
 
 export const authClient = new Proxy({} as any, {
   get(_target, prop) {
