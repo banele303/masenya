@@ -1,12 +1,13 @@
 export const dynamic = "force-dynamic";
 
-import { auth } from "@/lib/auth";
-import { toNextJsHandler } from "better-auth/next-js";
-
 export async function GET(req: Request) {
+  const { auth } = await import("@/lib/auth");
+  const { toNextJsHandler } = await import("better-auth/next-js");
   return toNextJsHandler(auth).GET(req);
 }
 
 export async function POST(req: Request) {
+  const { auth } = await import("@/lib/auth");
+  const { toNextJsHandler } = await import("better-auth/next-js");
   return toNextJsHandler(auth).POST(req);
 }

@@ -82,10 +82,7 @@ export const authClient = new Proxy({} as any, {
   },
 }) as ReturnType<typeof createAuthClient>;
 
-export const signIn = authClient.signIn;
-export const signUp = authClient.signUp;
-export const signOut = authClient.signOut;
-export const useSession = authClient.useSession;
-
-
-
+export const signIn = (...args: any[]) => (authClient as any).signIn(...args);
+export const signUp = (...args: any[]) => (authClient as any).signUp(...args);
+export const signOut = (...args: any[]) => (authClient as any).signOut(...args);
+export const useSession = () => (authClient as any).useSession();
