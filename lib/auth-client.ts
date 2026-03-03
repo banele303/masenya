@@ -7,6 +7,7 @@ const getBaseURL = () => {
     return window.location.origin;
   }
 
+  console.log("DEBUG: NEXT_PUBLIC_BASE_URL env:", process.env.NEXT_PUBLIC_BASE_URL);
   const envUrl =
     process.env.NEXT_PUBLIC_BASE_URL ||
     (process.env.NEXT_PUBLIC_VERCEL_URL
