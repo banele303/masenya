@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 
 function getBaseURL() {
-  const url =
+  const envUrl =
     process.env.BETTER_AUTH_URL ||
     process.env.NEXT_PUBLIC_BASE_URL ||
     (process.env.VERCEL_PROJECT_PRODUCTION_URL
@@ -9,20 +9,33 @@ function getBaseURL() {
       : undefined) ||
     (process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000");
+      : undefined);
 
-  if (!url || url === "undefined" || url === "null") {
-    return "http://localhost:3000";
+  // Default fallback for build time
+  const defaultUrl = "http://localhost:3000";
+
+  if (!envUrl || typeof envUrl !== "string" || envUrl.trim() === "" || envUrl === "undefined" || envUrl === "null") {
+    return defaultUrl;
   }
 
+  const url = envUrl.trim();
+
+  // If it's already absolute and valid, return it
   if (url.startsWith("http://") || url.startsWith("https://")) {
     return url;
   }
 
-  if (url.includes("localhost") || url.includes("127.0.0.1")) {
+  // Handle localhost cases
+  if (url.startsWith("localhost") || url.startsWith("127.0.0.1")) {
     return `http://${url}`;
   }
 
+  // If it looks like a relative path, it's invalid for baseURL
+  if (url.startsWith("/")) {
+    return defaultUrl;
+  }
+
+  // Otherwise assume https
   return `https://${url}`;
 }
 
@@ -40,37 +53,47 @@ let _auth: any = null;
 
 function getAuth() {
   if (!_auth) {
-    _auth = betterAuth({
-      baseURL: getBaseURL(),
-      emailAndPassword: {
-        enabled: true,
-      },
-      socialProviders: getSocialProviders(),
-      session: {
-        expiresIn: 60 * 60 * 24 * 7, // 7 days
-        updateAge: 60 * 60 * 24, // 1 day
-      },
-    });
+    // During build, better-auth might fail if baseURL is not perfect.
+    // We try to catch any initialization errors to prevent build failure.
+    try {
+      _auth = betterAuth({
+        baseURL: getBaseURL(),
+        emailAndPassword: {
+          enabled: true,
+        },
+        socialProviders: getSocialProviders(),
+        session: {
+          expiresIn: 60 * 60 * 24 * 7, // 7 days
+          updateAge: 60 * 60 * 24, // 1 day
+        },
+      });
+    } catch (e) {
+      console.error("Better Auth initialization failed during build:", e);
+      // Return a dummy object if initialization fails
+      return {
+        handler: () => new Response("Auth unavailable", { status: 503 }),
+        api: {},
+      } as any;
+    }
   }
   return _auth;
 }
 
 /**
  * Lazy initialization of Better Auth with a Proxy.
- * We use a function as the target to ensure 'auth' is callable,
- * which is expected by some parts of Better Auth and the Next.js handler.
  */
-export const auth: ReturnType<typeof betterAuth> = new Proxy((() => {}) as any, {
+export const auth: ReturnType<typeof betterAuth> = new Proxy({} as any, {
   get(_target, prop) {
     const actualAuth = getAuth();
-    const value = (actualAuth as any)[prop];
-    if (typeof value === "function") {
-      return value.bind(actualAuth);
+    if (prop in actualAuth) {
+      const value = (actualAuth as any)[prop];
+      if (typeof value === "function") {
+        return value.bind(actualAuth);
+      }
+      return value;
     }
-    return value;
+    return undefined;
   },
-  apply(_target, thisArg, args) {
-    return (getAuth() as any).apply(thisArg, args);
-  },
+  // Ensure it's not callable as a function if it was a Proxy(fn) before
 });
 

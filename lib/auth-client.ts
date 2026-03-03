@@ -8,17 +8,33 @@
 import { createAuthClient } from "better-auth/react";
 
 const getBaseURL = () => {
-  let url =
+  const envUrl =
     process.env.NEXT_PUBLIC_BASE_URL ||
     (process.env.NEXT_PUBLIC_VERCEL_URL
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
       : "http://localhost:3000");
-  if (url.includes("localhost") && !url.startsWith("http://")) {
-    url = `http://${url}`;
-  } else if (!url.startsWith("http")) {
-    url = `https://${url}`;
+
+  const defaultUrl = "http://localhost:3000";
+
+  if (!envUrl || typeof envUrl !== "string" || envUrl.trim() === "" || envUrl === "undefined" || envUrl === "null") {
+    return defaultUrl;
   }
-  return url;
+
+  const url = envUrl.trim();
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  if (url.startsWith("localhost") || url.startsWith("127.0.0.1")) {
+    return `http://${url}`;
+  }
+
+  if (url.startsWith("/")) {
+    return defaultUrl;
+  }
+
+  return `https://${url}`;
 };
 
 const isBrowser = typeof window !== "undefined";

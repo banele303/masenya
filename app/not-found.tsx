@@ -82,7 +82,7 @@ export default function NotFound() {
               variant="outline"
               className="rounded-full glass border-white/20"
             >
-              <Link href="/dealership">
+              <Link href="/products">
                 <Car className="mr-2 h-5 w-5" />
                 View Our Cars
               </Link>
