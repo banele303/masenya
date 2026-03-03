@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 
-function getBaseURL() {
+const getBaseURL = () => {
   const envUrl =
     process.env.BETTER_AUTH_URL ||
     process.env.NEXT_PUBLIC_BASE_URL ||
@@ -9,35 +9,26 @@ function getBaseURL() {
       : undefined) ||
     (process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : undefined);
+      : undefined) ||
+    "http://localhost:3000";
 
-  // Default fallback for build time
-  const defaultUrl = "http://localhost:3000";
-
-  if (!envUrl || typeof envUrl !== "string" || envUrl.trim() === "" || envUrl === "undefined" || envUrl === "null") {
-    return defaultUrl;
+  try {
+    // If it's already a valid absolute URL, the constructor will work
+    const url = new URL(envUrl);
+    return url.origin;
+  } catch (e) {
+    // If it failed, try adding a protocol
+    try {
+      if (envUrl.includes("localhost") || envUrl.includes("127.0.0.1")) {
+        return new URL(`http://${envUrl}`).origin;
+      }
+      return new URL(`https://${envUrl}`).origin;
+    } catch (e2) {
+      // Final fallback
+      return "http://localhost:3000";
+    }
   }
-
-  const url = envUrl.trim();
-
-  // If it's already absolute and valid, return it
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
-  }
-
-  // Handle localhost cases
-  if (url.startsWith("localhost") || url.startsWith("127.0.0.1")) {
-    return `http://${url}`;
-  }
-
-  // If it looks like a relative path, it's invalid for baseURL
-  if (url.startsWith("/")) {
-    return defaultUrl;
-  }
-
-  // Otherwise assume https
-  return `https://${url}`;
-}
+};
 
 const getSocialProviders = () =>
   process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
@@ -52,9 +43,22 @@ const getSocialProviders = () =>
 let _auth: any = null;
 
 function getAuth() {
+  // CRITICAL: Prevent better-auth from initializing during static generation
+  // Next.js sets NEXT_PHASE during the build process
+  const isBuild = 
+    process.env.NEXT_PHASE === "phase-production-build" || 
+    process.env.CI === "true" ||
+    process.env.NODE_ENV === "production" && !process.env.BETTER_AUTH_SECRET;
+
+  if (isBuild) {
+    return {
+      handler: () => new Response("Auth disabled during build", { status: 503 }),
+      api: {},
+      options: { baseURL: getBaseURL() }
+    } as any;
+  }
+
   if (!_auth) {
-    // During build, better-auth might fail if baseURL is not perfect.
-    // We try to catch any initialization errors to prevent build failure.
     try {
       _auth = betterAuth({
         baseURL: getBaseURL(),
@@ -63,16 +67,16 @@ function getAuth() {
         },
         socialProviders: getSocialProviders(),
         session: {
-          expiresIn: 60 * 60 * 24 * 7, // 7 days
-          updateAge: 60 * 60 * 24, // 1 day
+          expiresIn: 60 * 60 * 24 * 7,
+          updateAge: 60 * 60 * 24,
         },
       });
     } catch (e) {
-      console.error("Better Auth initialization failed during build:", e);
-      // Return a dummy object if initialization fails
+      console.error("Better Auth failed to initialize:", e);
       return {
-        handler: () => new Response("Auth unavailable", { status: 503 }),
+        handler: () => new Response("Auth error", { status: 500 }),
         api: {},
+        options: { baseURL: getBaseURL() }
       } as any;
     }
   }
@@ -81,9 +85,15 @@ function getAuth() {
 
 /**
  * Lazy initialization of Better Auth with a Proxy.
+ * This prevents the constructor from running until auth is actually used.
  */
 export const auth: ReturnType<typeof betterAuth> = new Proxy({} as any, {
   get(_target, prop) {
+    // Some internal tools or React might check for these props
+    if (prop === '$$typeof' || prop === 'prototype' || prop === 'constructor') {
+      return undefined;
+    }
+    
     const actualAuth = getAuth();
     if (prop in actualAuth) {
       const value = (actualAuth as any)[prop];
@@ -94,6 +104,6 @@ export const auth: ReturnType<typeof betterAuth> = new Proxy({} as any, {
     }
     return undefined;
   },
-  // Ensure it's not callable as a function if it was a Proxy(fn) before
 });
+
 
