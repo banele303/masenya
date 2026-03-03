@@ -90,7 +90,25 @@ export const authClient = new Proxy({} as any, {
   },
 }) as ReturnType<typeof createAuthClient>;
 
-export const signIn = authClient.signIn;
-export const signUp = authClient.signUp;
-export const signOut = authClient.signOut;
-export const useSession = authClient.useSession;
+const createLazyExport = (getter: () => any) => {
+  return new Proxy({} as any, {
+    get: (_target, prop) => {
+      const target = getter();
+      const value = target[prop];
+      if (typeof value === "function") {
+        return value.bind(target);
+      }
+      return value;
+    },
+    // For things like useSession() that are functions themselves
+    apply: (_target, _thisArg, args) => {
+      const target = getter();
+      return target(...args);
+    }
+  });
+};
+
+export const signIn = createLazyExport(() => getClient().signIn);
+export const signUp = createLazyExport(() => getClient().signUp);
+export const signOut = (...args: any[]) => getClient().signOut(...args);
+export const useSession = () => getClient().useSession();
