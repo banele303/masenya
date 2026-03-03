@@ -8,13 +8,16 @@ const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
 let convexClient: ConvexReactClient | null = null;
 
 function getConvexClient() {
-  console.log("DEBUG: getConvexClient() called. CONVEX_URL:", CONVEX_URL);
-  if (!convexClient && CONVEX_URL) {
+  if (convexClient) return convexClient;
+  
+  // Basic validation to avoid "not an absolute URL" crash
+  const isValidUrl = CONVEX_URL && (CONVEX_URL.startsWith("http://") || CONVEX_URL.startsWith("https://"));
+  
+  if (isValidUrl) {
     try {
-      convexClient = new ConvexReactClient(CONVEX_URL);
-      console.log("DEBUG: ConvexReactClient initialized successfully.");
+      convexClient = new ConvexReactClient(CONVEX_URL!);
     } catch (e) {
-      console.error("DEBUG: ConvexReactClient initialization FAILED:", e);
+      console.error("Convex initialization failed:", e);
     }
   }
   return convexClient;
@@ -26,10 +29,11 @@ export default function ConvexClientProvider({
 }: {
   children: ReactNode;
 }) {
-  const client = useMemo(() => getConvexClient(), []);
+  const client = getConvexClient();
 
   if (!client) {
-    // During build or if env var is missing, render children without Convex
+    // Critical: If Convex is missing during build, we MUST still render children
+    // to allow static generation to complete for non-Convex parts.
     return <>{children}</>;
   }
 

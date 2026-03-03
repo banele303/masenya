@@ -44,11 +44,23 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Convex Mutation
-  const createInquiry = useMutation(api.inquiries.create);
+  // Convex Mutation - safely handled for build time
+  let createInquiry: any = null;
+  try {
+    // This is safe because useMutation is called top-level in the component
+    createInquiry = useMutation(api.inquiries.create);
+  } catch (e) {
+    // During build, if ConvexProvider is missing/empty, this might throw
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!createInquiry) {
+      toast.error("Systems are currently in maintenance. Please call us directly.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -64,6 +76,7 @@ export default function ContactPage() {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-white">
