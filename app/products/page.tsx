@@ -71,7 +71,7 @@ export default function ProductsPage() {
       <section className="relative pt-40 pb-48 overflow-hidden bg-slate-900 mx-4 sm:mx-6 rounded-[40px] mt-4">
         <div className="absolute inset-0 z-0">
            <Image 
-             src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1200&auto=format&fit=crop" 
+             src="/new-parts4.png" 
              alt="Parts Warehouse" 
              fill 
              className="object-cover opacity-60 mix-blend-screen scale-105" 
@@ -250,7 +250,7 @@ export default function ProductsPage() {
         <div className="container mx-auto px-6">
            <div className="relative rounded-[60px] bg-slate-900 overflow-hidden p-12 lg:p-32 group">
               <div className="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none transition-transform duration-1000 group-hover:scale-110">
-                 <Image src="/engine.png" alt="bg" fill className="object-cover" />
+                 <Image src="/new-parts.png" alt="bg" fill className="object-cover" />
               </div>
               <div className="relative z-10 grid lg:grid-cols-2 gap-20 items-center">
                  <div>

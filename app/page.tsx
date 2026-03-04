@@ -94,7 +94,7 @@ const categories = [
     name: "Braking Systems", 
     icon: Disc, 
     count: "1.2k Items",
-    image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1200&auto=format&fit=crop",
+    image: "/new-parts3.png",
     href: "/products?category=brakes"
   },
   { 
@@ -202,13 +202,13 @@ export default function Home() {
             {/* LEFT SIDEBAR — Stacked Part Images */}
             <div className="hidden lg:flex col-span-2 flex-col gap-2">
               {[
-                "/tire.png",
-                "/break.png",
+                "/new-parts.png",
+                "/new-parts-2.png",
               ].map((img, i) => (
                 <div key={i} className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-white shadow-sm group cursor-pointer">
                   <Image
                     src={img}
-                    alt={i === 0 ? "Tire replacement" : "Brake replacement"}
+                    alt={i === 0 ? "New Part 1" : "New Part 2"}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -421,10 +421,10 @@ export default function Home() {
             <div className="flex gap-3 overflow-x-auto no-scrollbar relative z-10">
               {[
                 "/engine.png", 
-                "/tires.png", 
-                "/break.png", 
+                "/new-parts4.png", 
+                "/new-parts3.png", 
                 "/car-body.png", 
-                "/tire2.png", 
+                "/new-parts-2.png", 
               ].map((imgUrl, i) => (
                 <div key={i} className="group w-16 h-16 rounded-sm bg-slate-800 border border-slate-700 p-1 shrink-0 cursor-pointer hover:border-red-500/50 transition-all shadow-lg active:scale-95">
                   <div className="w-full h-full bg-slate-900 rounded-xs overflow-hidden relative">
@@ -529,7 +529,7 @@ export default function Home() {
         {/* Background Image Overlay */}
         <div className="absolute inset-0 z-0 opacity-20">
           <Image 
-            src="/hero-deco.jpg" 
+            src="/new-parts-2.png" 
             alt="Background" 
             fill 
             className="object-cover grayscale"
